@@ -8,58 +8,43 @@ from textknnassifier import classifier
 
 
 @pytest.fixture
-def training_data() -> list[classifier.DataEntry]:
+def training_data() -> list[str]:
     """Returns a list of DataEntry objects for the training dataset.
 
     Returns:
         list[classifier.DataEntry]: A list of DataEntry objects.
     """
     return [
-        classifier.DataEntry(text="This is a test", label="test1"),
-        classifier.DataEntry(text="Another test", label="test1"),
-        classifier.DataEntry(text="General Tarkin", label="test2"),
-        classifier.DataEntry(text="General Grievous", label="test2"),
+        "This is a test",
+        "Another test",
+        "General Tarkin",
+        "General Grievous",
     ]
 
 
 @pytest.fixture
-def testing_data() -> list[classifier.DataEntry]:
+def training_labels() -> list[str]:
+    """Returns a list of labels for the training dataset.
+
+    Returns:
+        list[str]: A list of labels.
+    """
+    return ["test", "test", "star_wars", "star_wars"]
+
+
+@pytest.fixture
+def testing_data() -> list[str]:
     """Returns a list of DataEntry objects for the testing dataset.
 
     Returns:
         list[classifier.DataEntry]: A list of DataEntry objects.
     """
     return [
-        classifier.DataEntry(text="This is a test"),
-        classifier.DataEntry(text="Testing here too!"),
-        classifier.DataEntry(text="General Kenobi"),
-        classifier.DataEntry(text="General Skywalker"),
+        "This is a test",
+        "Testing here too!",
+        "General Kenobi",
+        "General Skywalker",
     ]
-
-
-def test_data_entry_init_no_label() -> None:
-    """Test the initialization of a DataEntry object without a label."""
-    entry = classifier.DataEntry(text="test")
-
-    assert entry.text == "test"
-    assert entry.label is None
-
-
-def test_data_entry_init() -> None:
-    """Test the initialization of a DataEntry object with a label."""
-    entry = classifier.DataEntry(text="test", label="test")
-
-    assert entry.text == "test"
-    assert entry.label == "test"
-
-
-def test_data_entry_empty_values() -> None:
-    """Test the initialization of a DataEntry object with invalid text."""
-    with pytest.raises(ValueError):
-        classifier.DataEntry(text="")
-
-    with pytest.raises(ValueError):
-        classifier.DataEntry(text="s", label="")
 
 
 def test_text_knn_classifier_init() -> None:
@@ -82,7 +67,7 @@ def test_text_knn_classifier_compute_distance_identical() -> None:
 
 
 def test_text_knn_classifier_predict_class(
-    training_data: list[classifier.DataEntry],
+    training_data: list[str], training_labels: list[str]
 ) -> None:
     """Test the prediction of the label for a single test entry.
 
@@ -90,14 +75,14 @@ def test_text_knn_classifier_predict_class(
         training_data: A fixture for the DataEntry objects for the training dataset.
     """
     gzip_knn = classifier.TextKNNClassifier(algorithm="gzip", n_labels=2)
-    predicted_class = gzip_knn._predict_class(training_data[0], training_data)
+    gzip_knn.fit(training_data, training_labels)
+    predicted_class = gzip_knn._predict_class(training_data[0])
 
-    assert predicted_class == training_data[0].label
+    assert predicted_class == training_labels[0]
 
 
 def test_text_knn_classifier_fit(
-    training_data: list[classifier.DataEntry],
-    testing_data: list[classifier.DataEntry],
+    training_data: list[str], training_labels: list[str], testing_data: list[str]
 ) -> None:
     """Test the fitting of the TextKNNClassifier to the training data and the prediction of the labels for the testing data.
 
@@ -106,6 +91,7 @@ def test_text_knn_classifier_fit(
         testing_data: A fixture for the DataEntry objects for the testing dataset.
     """
     gzip_knn = classifier.TextKNNClassifier(algorithm="gzip", n_labels=2)
-    predicted_classes = gzip_knn.fit(training_data, testing_data)
+    gzip_knn.fit(training_data, training_labels)
+    predicted_classes = gzip_knn.predict(testing_data)
 
-    assert predicted_classes == ["test1", "test1", "test2", "test2"]
+    assert predicted_classes == training_labels
