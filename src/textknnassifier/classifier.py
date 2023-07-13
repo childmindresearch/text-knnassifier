@@ -15,7 +15,7 @@ class TextKNNClassifier:
 
     Attributes:
         compressor: A Compressor object used to compress the data.
-        max_neighbors: The number of nearest neighbors to consider when predicting
+        n_neighbors: The number of nearest neighbors to consider when predicting
             the label of a test entry.
         training_data: The training data used to fit the classifier.
         training_labels: The labels for the training data.
@@ -28,17 +28,17 @@ class TextKNNClassifier:
 
     """
 
-    def __init__(self, algorithm: str = "gzip", max_neighbors: int = 10):
+    def __init__(self, algorithm: str = "gzip", n_neighbors: int = 10):
         """Initializes a TextKNNClassifier object.
 
         Args:
             algorithm: The compression algorithm to use. Defaults to "gzip".
-            max_neighbors: The number of nearest neighbors to consider when predicting
+            n_neighbors: The number of nearest neighbors to consider when predicting
                 the label of a test entry. Defaults to 10.
 
         """
         self.compressor = compressor.Compressor(algorithm=algorithm)
-        self.max_neighbors = max_neighbors
+        self.n_neighbors = n_neighbors
         self.training_data: Optional[Sequence[str]] = None
         self.training_labels: Optional[Sequence[str]] = None
 
@@ -99,7 +99,7 @@ class TextKNNClassifier:
             key=lambda i: distance_from_training[i],
         )
         top_k_class = [
-            self.training_labels[i] for i in sorted_indices[: self.max_neighbors]
+            self.training_labels[i] for i in sorted_indices[: self.n_neighbors]
         ]
         predicted_class = max(set(top_k_class), key=top_k_class.count)
         return predicted_class
@@ -114,7 +114,7 @@ class TextKNNClassifier:
         Returns:
             The normalized compressed distance between the two texts.
         """
-        combined = text_1 + " " + text_2
+        combined = f"{text_1} {text_2}"
         compressed_size_combined = len(self.compressor.fit(combined))
         compressed_size_1 = len(self.compressor.fit(text_1))
         compressed_size_2 = len(self.compressor.fit(text_2))
