@@ -4,13 +4,16 @@ permissions:
   actions: "write"
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Python Tests"]
+    types:
+      - completed
     branches:
-      - "main"
+      - main
 
 jobs:
-  tagged-release:
-    name: "Tagged Release"
+  pypi-release:
+    name: "PyPi Release"
     runs-on: "ubuntu-latest"
 
     steps:
