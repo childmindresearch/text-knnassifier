@@ -1,4 +1,6 @@
 """ Unit tests for the Compressor class. """
+from __future__ import annotations
+
 from pytest import mark
 
 from textknnassifier.compressor import Compressor
@@ -20,7 +22,7 @@ def test_compressor_gzip(algorithm: str) -> None:
     assert len(compressed) < len(data.encode("utf-8"))
 
 
-def test_compressor_invalid_algorithm():
+def test_compressor_invalid_algorithm() -> None:
     """Test that an invalid compression algorithm raises a ValueError with a
     specific error message."""
     try:

@@ -1,5 +1,7 @@
 """ Unit tests for the classifier module. """
 # pylint: disable=protected-access,redefined-outer-name
+from __future__ import annotations
+
 import gzip
 
 import pytest
