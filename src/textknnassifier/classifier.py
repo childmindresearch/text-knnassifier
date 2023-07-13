@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-import collections
+import statistics
 from typing import Iterable, Optional, Sequence
 
 from textknnassifier import compressor
@@ -102,9 +102,7 @@ class TextKNNClassifier:
         top_n_class = [
             self.training_labels[i] for i in sorted_indices[: self.n_neighbors]
         ]
-        predicted_class = collections.Counter(top_n_class).most_common(1)[0][0]
-
-        return predicted_class
+        return statistics.mode(top_n_class)
 
     def _compute_distance(self, text_1: str, text_2: str) -> float:
         """Computes the normalized compressed distance between two texts.
