@@ -26,7 +26,7 @@ jobs:
           poetry install -E docs
       - name: Build docs
         run: |
-          poetry run pdoc src/APP_NAME -o docs_build -t docs/pdoc-theme --docformat google
+          poetry run pdoc src/textknnassifier -o docs_build -t docs/pdoc-theme --docformat google
           touch docs_build/.nojekyll
       - uses: JamesIves/github-pages-deploy-action@v4
         with:
