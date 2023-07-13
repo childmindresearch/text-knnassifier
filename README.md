@@ -1,5 +1,11 @@
 # TextKNNClassifier
 
+[![Build](https://github.com/cmi-dair/text-knnassifier/actions/workflows/test.yaml/badge.svg?branch=main)](https://github.com/cmi-dair/text-knnassifier/actions/workflows/test.yaml?query=branch%3Amain)
+[![codecov](https://codecov.io/gh/cmi-dair/text-knnassifier/branch/main/graph/badge.svg?token=22HWWFWPW5)](https://codecov.io/gh/cmi-dair/text-knnassifier)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![L-GPL License](https://img.shields.io/badge/license-L--GPL-blue.svg)](LICENSE)
+[![pages](https://img.shields.io/badge/api-docs-blue)](https://cmi-dair.github.io/template-python-repository)
+
 `TextKNNClassifier` is a k-nearest neighbors classifier for text data. It uses a compression algorithm to compute the distance between texts and predicts the label of a test entry based on the labels of the k-nearest neighbors in the training data.
 
 ## Installation
@@ -24,8 +30,6 @@ training_text = [
     "General Grievous",
 ]
 training_labels = ["test", "test", "star_wars", "star_wars"]
-
-
 testing_data = [
     "This is a test",
     "Testing here too!",
@@ -33,10 +37,10 @@ testing_data = [
     "General Skywalker",
 ]
 
-
 KNN = classifier.TextKNNClassifier(max_neighbors=2)
 KNN.fit(training_data, training_labels)
 predicted_labels = KNN.predict(testing_data)
+
 print(predicted_labels)
 # Output: ['test1', 'test1', 'star_wars', 'star_wars']
 ```
