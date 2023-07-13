@@ -20,7 +20,7 @@ class DataEntry(pydantic.BaseModel):
 
     text: str = pydantic.Field(..., description="The text of the entry.", min_length=1)
     label: Optional[str] = pydantic.Field(
-        None, description="The label of the entry.", min_length=1
+        default=None, description="The label of the entry.", min_length=1
     )
 
 
