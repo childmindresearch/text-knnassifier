@@ -49,15 +49,15 @@ def testing_data() -> list[str]:
 
 def test_text_knn_classifier_init() -> None:
     """Test the initialization of a TextKNNClassifier object."""
-    gzip_knn = classifier.TextKNNClassifier(algorithm="gzip", max_neighbors=10)
+    gzip_knn = classifier.TextKNNClassifier(algorithm="gzip", n_neighbors=10)
 
     assert gzip_knn.compressor.algorithm == gzip
-    assert gzip_knn.max_neighbors == 10
+    assert gzip_knn.n_neighbors == 10
 
 
 def test_text_knn_classifier_compute_distance_identical() -> None:
     """Test the computation of the normalized compressed distance between two texts."""
-    gzip_knn = classifier.TextKNNClassifier(algorithm="gzip", max_neighbors=10)
+    gzip_knn = classifier.TextKNNClassifier(algorithm="gzip", n_neighbors=10)
     distance = gzip_knn._compute_distance("test", "test")
 
     # Currently I'm not sure how to properly test this, but 0.125 is the value
@@ -74,7 +74,7 @@ def test_text_knn_classifier_predict_class(
     Args:
         training_data: A fixture for the DataEntry objects for the training dataset.
     """
-    gzip_knn = classifier.TextKNNClassifier(algorithm="gzip", max_neighbors=2)
+    gzip_knn = classifier.TextKNNClassifier(algorithm="gzip", n_neighbors=2)
     gzip_knn.fit(training_data, training_labels)
     predicted_class = gzip_knn._predict_class(training_data[0])
 
@@ -90,7 +90,7 @@ def test_text_knn_classifier_fit(
         training_data: A fixture for the DataEntry objects for the training dataset.
         testing_data: A fixture for the DataEntry objects for the testing dataset.
     """
-    gzip_knn = classifier.TextKNNClassifier(algorithm="gzip", max_neighbors=2)
+    gzip_knn = classifier.TextKNNClassifier(algorithm="gzip", n_neighbors=2)
     gzip_knn.fit(training_data, training_labels)
     predicted_classes = gzip_knn.predict(testing_data)
 
