@@ -4,7 +4,7 @@
 [![codecov](https://codecov.io/gh/cmi-dair/text-knnassifier/branch/main/graph/badge.svg?token=22HWWFWPW5)](https://codecov.io/gh/cmi-dair/text-knnassifier)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![L-GPL License](https://img.shields.io/badge/license-L--GPL-blue.svg)](LICENSE)
-[![pages](https://img.shields.io/badge/api-docs-blue)](https://cmi-dair.github.io/template-python-repository)
+[![pages](https://img.shields.io/badge/api-docs-blue)](https://cmi-dair.github.io/text-knnassifier)
 
 `TextKNNClassifier` is a k-nearest neighbors classifier for text data. It uses a compression algorithm to compute the distance between texts and predicts the label of a test entry based on the labels of the k-nearest neighbors in the training data.
 
