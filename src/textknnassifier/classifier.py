@@ -1,38 +1,26 @@
 """ A k-nearest neighbors classifier for text data. """
+
+# pylint: disable=invalid-name
+# Disabled because it is requied to conform to the scikit-learn interface.
+
 from __future__ import annotations
 
-from typing import Iterable, Optional
+from typing import Iterable, Optional, Sequence
 
 import numpy as np
-import pydantic
 
 from textknnassifier import compressor
 
 
-class DataEntry(pydantic.BaseModel):
-    """
-    Represents a single data entry for the TextKNNClassifier.
-
-    Attributes:
-        text: The text of the entry.
-        label: The label of the entry.
-    """
-
-    text: str = pydantic.Field(..., description="The text of the entry.", min_length=1)
-    label: Optional[str] = pydantic.Field(
-        default=None, description="The label of the entry.", min_length=1
-    )
-
-
 class TextKNNClassifier:
-    """
-    A k-nearest neighbors classifier for text data.
+    """A k-nearest neighbors classifier for text data.
 
     Attributes:
-        algorithm: The compression algorithm to use for computing the distance
-            between texts.
-        n_labels: The number of nearest neighbors to consider when predicting
+        compressor: A Compressor object used to compress the data.
+        max_neighbors: The number of nearest neighbors to consider when predicting
             the label of a test entry.
+        training_data: The training data used to fit the classifier.
+        training_labels: The labels for the training data.
 
     References:
         Jiang, Z., Yang, M., Tsirlin, M., Tang, R., Dai, Y., & Lin, J. (2023,
@@ -42,15 +30,44 @@ class TextKNNClassifier:
 
     """
 
-    def __init__(self, algorithm: str = "gzip", n_labels: int = 10):
-        self.compressor = compressor.Compressor(algorithm=algorithm)
-        self.n_labels = n_labels
+    def __init__(self, algorithm: str = "gzip", max_neighbors: int = 10):
+        """Initializes a TextKNNClassifier object.
 
-    def fit(
-        self, training: Iterable[DataEntry], testing: Iterable[DataEntry]
-    ) -> list[str]:
+        Args:
+            algorithm: The compression algorithm to use. Defaults to "gzip".
+            max_neighbors: The number of nearest neighbors to consider when predicting
+                the label of a test entry. Defaults to 10.
+
         """
-        Fits the TextKNNClassifier to the training data and predicts the labels for the testing data.
+        self.compressor = compressor.Compressor(algorithm=algorithm)
+        self.max_neighbors = max_neighbors
+        self.training_data: Optional[Sequence[str]] = None
+        self.training_labels: Optional[Sequence[str]] = None
+
+    def fit(self, X: Sequence[str], y: Sequence[str]) -> None:
+        """Sets up the TextKNNClassifier with the training data.
+
+        Args:
+            X: An iterable of strings representing the training data.
+            y: An iterable of strings representing the labels for the training
+                data.
+
+        Notes:
+            This function exists solely to conform to the standard scikit-learn
+            interface.
+
+        """
+        if len(X) != len(y):
+            raise ValueError(
+                "Training data and training labels must have the same length."
+            )
+
+        self.training_data = X
+        self.training_labels = y
+
+    def predict(self, X: Iterable[str]) -> list[str]:
+        """Fits the TextKNNClassifier to the training data and predicts the
+        labels for the testing data.
 
         Args:
             training: An iterable of DataEntry objects representing the training data.
@@ -59,14 +76,10 @@ class TextKNNClassifier:
         Returns:
             A list of predicted labels for the testing data.
         """
-        if any((not entry.label for entry in training)):
-            raise ValueError("All training entries must have a label.")
+        return [self._predict_class(test_entry) for test_entry in X]
 
-        return [self._predict_class(entry, training) for entry in testing]
-
-    def _predict_class(self, test_entry, training) -> str:
-        """
-        Predicts the label for a single test entry based on the labels of
+    def _predict_class(self, test_entry) -> str:
+        """Predicts the label for a single test entry based on the labels of
         the k-nearest neighbors in the training data.
 
         Args:
@@ -76,18 +89,22 @@ class TextKNNClassifier:
         Returns:
             The predicted label for the test entry.
         """
+        if not self.training_data or not self.training_labels:
+            raise ValueError("The classifier must be fit to training data first.")
+
         distance_from_training = [
-            self._compute_distance(test_entry.text, train_entry.text)
-            for train_entry in training
+            self._compute_distance(test_entry, train_entry)
+            for train_entry in self.training_data
         ]
         sorted_indices = np.argsort(distance_from_training)
-        top_k_class = [training[i].label for i in sorted_indices[: self.n_labels]]
+        top_k_class = [
+            self.training_labels[i] for i in sorted_indices[: self.max_neighbors]
+        ]
         predicted_class = max(set(top_k_class), key=top_k_class.count)
         return predicted_class
 
     def _compute_distance(self, text_1: str, text_2: str) -> float:
-        """
-        Computes the normalized compressed distance between two texts.
+        """Computes the normalized compressed distance between two texts.
 
         Args:
             text_1: The first text.
