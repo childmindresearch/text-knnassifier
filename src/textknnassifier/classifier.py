@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import collections
 from typing import Iterable, Optional, Sequence
 
 from textknnassifier import compressor
@@ -98,10 +99,11 @@ class TextKNNClassifier:
             range(len(distance_from_training)),
             key=lambda i: distance_from_training[i],
         )
-        top_k_class = [
+        top_n_class = [
             self.training_labels[i] for i in sorted_indices[: self.n_neighbors]
         ]
-        predicted_class = max(set(top_k_class), key=top_k_class.count)
+        predicted_class = collections.Counter(top_n_class).most_common(1)[0][0]
+
         return predicted_class
 
     def _compute_distance(self, text_1: str, text_2: str) -> float:
