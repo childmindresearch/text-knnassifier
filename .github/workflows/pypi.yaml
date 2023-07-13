@@ -1,17 +1,47 @@
-name: Publish to PyPi
+name: "Publish to PyPi"
+
+permissions:
+  actions: "write"
 
 on:
-  workflow_run:
-    workflows: ["Python Tests"]
-    types:
-      - completed
+  push:
     branches:
-      - main
+      - "main"
 
 jobs:
-  publish:
-    runs-on: ubuntu-latest
+  tagged-release:
+    name: "Tagged Release"
+    runs-on: "ubuntu-latest"
+
     steps:
-      - uses: JRubics/poetry-publish@v1.17
+      - uses: actions/checkout@v3
         with:
-          pypi_token: ${{ secrets.PYPI_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up Python 3.8.
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Skip if version did not change.
+        run: |
+          version_change=$(git diff ${{ github.event.before }} ${{ github.event.after }} pyproject.toml | grep -E "^(\+|-)version =")
+          if [[ -z "$version_change" ]]; then
+            gh run cancel ${{ github.run_id }}
+            gh run watch ${{ github.run_id }}
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build package.
+        run: |
+          python -m pip install poetry
+          poetry install --only main
+          poetry build
+
+      - name: Publish to PyPi.
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_TOKEN }}
+          verbose: true
