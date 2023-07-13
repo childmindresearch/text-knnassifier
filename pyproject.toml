@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "textknnassifier"
-version = "0.0.1rc"
+version = "0.0.1rc1"
 description = "TextKNNClassifier is a k-nearest neighbors classifier for text data. It uses a compression algorithm to compute the distance between texts and predicts the label of a test entry based on the labels of the k-nearest neighbors in the training data."
 authors = ["Reinder Vos de Wael <reinder.vosdewael@childmind.org>"]
 license = "LGPL-2.1"
