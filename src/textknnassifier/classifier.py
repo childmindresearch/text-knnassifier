@@ -17,7 +17,7 @@ class TextKNNClassifier:
 
     Attributes:
         compressor: A Compressor object used to compress the data.
-        n_labels: The number of nearest neighbors to consider when predicting
+        max_neighbors: The number of nearest neighbors to consider when predicting
             the label of a test entry.
         training_data: The training data used to fit the classifier.
         training_labels: The labels for the training data.
@@ -30,17 +30,17 @@ class TextKNNClassifier:
 
     """
 
-    def __init__(self, algorithm: str = "gzip", n_labels: int = 10):
+    def __init__(self, algorithm: str = "gzip", max_neighbors: int = 10):
         """Initializes a TextKNNClassifier object.
 
         Args:
             algorithm: The compression algorithm to use. Defaults to "gzip".
-            n_labels: The number of nearest neighbors to consider when predicting
+            max_neighbors: The number of nearest neighbors to consider when predicting
                 the label of a test entry. Defaults to 10.
 
         """
         self.compressor = compressor.Compressor(algorithm=algorithm)
-        self.n_labels = n_labels
+        self.max_neighbors = max_neighbors
         self.training_data: Optional[Sequence[str]] = None
         self.training_labels: Optional[Sequence[str]] = None
 
@@ -97,7 +97,9 @@ class TextKNNClassifier:
             for train_entry in self.training_data
         ]
         sorted_indices = np.argsort(distance_from_training)
-        top_k_class = [self.training_labels[i] for i in sorted_indices[: self.n_labels]]
+        top_k_class = [
+            self.training_labels[i] for i in sorted_indices[: self.max_neighbors]
+        ]
         predicted_class = max(set(top_k_class), key=top_k_class.count)
         return predicted_class
 

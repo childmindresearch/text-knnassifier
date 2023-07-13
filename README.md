@@ -4,10 +4,10 @@
 
 ## Installation
 
-You can install `TextKNNClassifier` using pip:
+You can install `TextKNNassifier` using pip:
 
 ```bash
-pip install textknnclassifier
+pip install textknnassifier
 ```
 
 ## Usage
@@ -17,26 +17,31 @@ Here's an example of how to use `TextKNNClassifier`:
 ```python
 from textknnassifier import classifier
 
-training_data = [
-    classifier.DataEntry(text="This is a test", label="test1"),
-    classifier.DataEntry(text="Another test", label="test1"),
-    classifier.DataEntry(text="General Tarkin", label="test2"),
-    classifier.DataEntry(text="General Grievous", label="test2"),
+training_text = [
+    "This is a test",
+    "Another test",
+    "General Tarkin",
+    "General Grievous",
 ]
+training_labels = ["test", "test", "star_wars", "star_wars"]
+
 
 testing_data = [
-    classifier.DataEntry(text="This is a test"),
-    classifier.DataEntry(text="General Patton"),
+    "This is a test",
+    "Testing here too!",
+    "General Kenobi",
+    "General Skywalker",
 ]
 
-KNN = classifier.TextKNNClassifier()
-predicted_labels = KNN.fit(training_data, testing_data, n_labels=2)
 
+KNN = classifier.TextKNNClassifier(max_neighbors=2)
+KNN.fit(training_data, training_labels)
+predicted_labels = KNN.predict(testing_data)
 print(predicted_labels)
-# Output: ['test1', 'test2']
+# Output: ['test1', 'test1', 'star_wars', 'star_wars']
 ```
 
-In this example, we create a `TextKNNClassifier` instance and use it to predict the labels of the test entries. The `fit` method takes three arguments: the training data, the testing data, and the number of labels. The training data is a list of `DataEntry` objects, which contain the text and label of each training entry. The testing data is a list of `DataEntry` objects, which contain the text of each testing entry. The number of labels is the number of labels to consider when predicting the label of a test entry. The `fit` method returns a list of predicted labels.
+In this example, we create a `TextKNNClassifier` instance and use it to predict the labels of the test entries. The initialization is given `max_neighbors=2`, this denotes the number of training datapoints to consider for predicting the testing label. The `fit` method takes two arguments: the training data, and the training labels. It simply stores these values for later use. The `predict` method takes the testing data as an argument and returns the predicted labels.
 
 ## References
 
