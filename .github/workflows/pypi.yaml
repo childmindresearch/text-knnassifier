@@ -1,0 +1,17 @@
+name: Publish to PyPi
+
+on:
+  workflow_run:
+    workflows: ["Python Tests"]
+    types:
+      - completed
+    branches:
+      - main
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: JRubics/poetry-publish@v1.17
+        with:
+          pypi_token: ${{ secrets.PYPI_TOKEN }}
