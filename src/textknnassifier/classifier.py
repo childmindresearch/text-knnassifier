@@ -7,8 +7,6 @@ from __future__ import annotations
 
 from typing import Iterable, Optional, Sequence
 
-import numpy as np
-
 from textknnassifier import compressor
 
 
@@ -96,7 +94,10 @@ class TextKNNClassifier:
             self._compute_distance(test_entry, train_entry)
             for train_entry in self.training_data
         ]
-        sorted_indices = np.argsort(distance_from_training)
+        sorted_indices = sorted(
+            range(len(distance_from_training)),
+            key=lambda i: distance_from_training[i],
+        )
         top_k_class = [
             self.training_labels[i] for i in sorted_indices[: self.max_neighbors]
         ]

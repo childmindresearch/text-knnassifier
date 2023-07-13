@@ -8,6 +8,11 @@ on:
 
 jobs:
   unit:
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.11"]
+    name: Unit tests with Python ${{ matrix.python-version }}
+
     permissions:
       contents: read
       pull-requests: write
@@ -16,7 +21,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
           python -m pip install poetry
@@ -24,12 +29,13 @@ jobs:
       - name: Run tests
         run: poetry run pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov-report=xml:coverage.xml --cov=src tests | tee pytest-coverage.txt
       - name: Pytest coverage comment
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && ${{ matrix.python-version }} == '3.11'
         uses: MishaKav/pytest-coverage-comment@main
         with:
           pytest-coverage-path: ./pytest-coverage.txt
           junitxml-path: ./pytest.xml
       - name: Upload coverage to Codecov
+        if: github.event_name == 'push' && ${{ matrix.python-version }} == '3.11'
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
