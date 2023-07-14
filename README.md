@@ -23,7 +23,7 @@ Here's an example of how to use `TextKNNClassifier`:
 ```python
 from textknnassifier import classifier
 
-training_text = [
+training_data = [
     "This is a test",
     "Another test",
     "General Tarkin",
@@ -42,7 +42,7 @@ KNN.fit(training_data, training_labels)
 predicted_labels = KNN.predict(testing_data)
 
 print(predicted_labels)
-# Output: ['test1', 'test1', 'star_wars', 'star_wars']
+# Output: ['test', 'test', 'star_wars', 'star_wars']
 ```
 
 In this example, we create a `TextKNNClassifier` instance and use it to predict the labels of the test entries. The initialization is given `n_neighbors=2`, this denotes the number of training datapoints to consider for predicting the testing label. The `fit` method takes two arguments: the training data, and the training labels. It simply stores these values for later use. The `predict` method takes the testing data as an argument and returns the predicted labels.
