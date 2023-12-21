@@ -3,61 +3,52 @@ name: Python Tests
 on:
   push:
     branches:
-      - main
+    - main
   pull_request:
 
 jobs:
   unit:
-    name: Unit tests with Python 3.8
-
-    permissions:
-      contents: read
-      pull-requests: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: 3.8
-      - name: Install dependencies
-        run: |
-          python -m pip install poetry
-          poetry install
-      - name: Run tests
-        run: poetry run pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov-report=xml:coverage.xml --cov=src tests | tee pytest-coverage.txt
-      - name: Pytest coverage comment
-        if: github.event_name == 'pull_request'
-        uses: MishaKav/pytest-coverage-comment@main
-        with:
-          pytest-coverage-path: ./pytest-coverage.txt
-          junitxml-path: ./pytest.xml
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+    - uses: actions/checkout@v4
+    - name: Install poetry
+      run: pipx install poetry
+    - uses: actions/setup-python@v5
+      with:
+        python-version-file: pyproject.toml
+        cache: poetry
+    - name: Install dependencies
+      run: |
+        poetry install
+    - name: Run tests
+      id: run-tests
+      run: >
+        poetry run pytest \
+          --junitxml=pytest.xml \
+          --cov-report=term-missing:skip-covered \
+          --cov-report=xml:coverage.xml \
+          --cov=src tests \
+          --log-level=DEBUG \
+          --verbose
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
 
-  black:
+  ruff:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: psf/black@stable
+    - uses: actions/checkout@v4
+    - uses: chartboost/ruff-action@v1
 
   mypy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-      - run: |
-          pip install poetry
-          poetry install
-          poetry run mypy .
-
-  isort:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: isort/isort-action@v1
-        with:
-          configuration: --profile black
+    - uses: actions/checkout@v4
+    - name: Install poetry
+      run: pipx install poetry
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: poetry
+    - run: |
+        poetry install
+        poetry run mypy .
